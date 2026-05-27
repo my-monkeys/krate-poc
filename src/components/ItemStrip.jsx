@@ -15,47 +15,50 @@ export default function ItemStrip({ caseData, wonItem, onAnimationEnd }) {
   const [highlightedIndex, setHighlightedIndex] = useState(null);
 
   useEffect(() => {
-    // Génère la strip avec le gagnant à WINNER_INDEX
     const strip = generateStripItems(caseData, TOTAL_ITEMS);
     strip[WINNER_INDEX] = wonItem;
     setItems(strip);
     setHighlightedIndex(null);
 
-    // Lance l'animation après le premier rendu
+    const pendingTimers = [];
+
     const startTimer = setTimeout(() => {
       if (!containerRef.current || !stripRef.current) return;
 
       const containerWidth = containerRef.current.offsetWidth;
-      // translateX pour centrer l'item gagnant sous le marqueur
       const targetX = -(WINNER_INDEX * ITEM_WIDTH) + containerWidth / 2 - ITEM_WIDTH / 2;
 
       stripRef.current.style.transition = `transform ${ANIMATION_DURATION}ms cubic-bezier(0.15, 0, 0.1, 1)`;
       stripRef.current.style.transform = `translateX(${targetX}px)`;
 
-      // Ticks décélérants pendant le défilement
       let delay = 30;
       let tickCount = 0;
       const MAX_TICKS = 60;
 
       const scheduleTick = () => {
         if (tickCount >= MAX_TICKS) return;
-        setTimeout(() => {
+        const t = setTimeout(() => {
           playTick();
           tickCount++;
           delay = Math.min(delay * 1.08, 400);
           scheduleTick();
         }, delay);
+        pendingTimers.push(t);
       };
       scheduleTick();
 
-      // Fin d'animation
-      setTimeout(() => {
+      const endTimer = setTimeout(() => {
         setHighlightedIndex(WINNER_INDEX);
-        setTimeout(onAnimationEnd, 1200);
+        const revealTimer = setTimeout(onAnimationEnd, 1200);
+        pendingTimers.push(revealTimer);
       }, ANIMATION_DURATION);
+      pendingTimers.push(endTimer);
     }, 100);
 
-    return () => clearTimeout(startTimer);
+    return () => {
+      clearTimeout(startTimer);
+      pendingTimers.forEach(clearTimeout);
+    };
   }, [caseData, wonItem, onAnimationEnd]);
 
   return (

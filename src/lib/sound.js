@@ -23,6 +23,11 @@ export function playTick() {
   playTone({ frequency: 900, duration: 0.04, volume: 0.25, type: 'square' });
 }
 
+export function warmUp() {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+}
+
 const RARITY_REVEAL = {
   consumer:      { frequency: 220, duration: 0.3, volume: 0.2 },
   industrial:    { frequency: 330, duration: 0.4, volume: 0.25 },

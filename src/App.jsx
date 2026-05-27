@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { pickItem } from '@/lib/rng.js';
 import { RARITY_SELL_PRICES } from '@/data/cases.js';
+import { warmUp } from '@/lib/sound.js';
 import Shop from '@/components/Shop.jsx';
 import CaseOpening from '@/components/CaseOpening.jsx';
 import RevealModal from '@/components/RevealModal.jsx';
@@ -37,6 +38,7 @@ export default function App() {
   };
 
   const handleOpenCase = useCallback((caseData) => {
+    warmUp(); // initialize AudioContext during user gesture
     if (balance < caseData.price) return;
     const item = pickItem(caseData);
     const newBalance = parseFloat((balance - caseData.price).toFixed(2));
