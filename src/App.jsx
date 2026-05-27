@@ -24,10 +24,9 @@ function saveState(balance, inventory) {
 }
 
 export default function App() {
-  const initial = loadState();
   const [phase, setPhase] = useState('shop');
-  const [balance, setBalance] = useState(initial.balance);
-  const [inventory, setInventory] = useState(initial.inventory);
+  const [balance, setBalance] = useState(() => loadState().balance);
+  const [inventory, setInventory] = useState(() => loadState().inventory);
   const [selectedCase, setSelectedCase] = useState(null);
   const [wonItem, setWonItem] = useState(null);
 
@@ -54,12 +53,14 @@ export default function App() {
   const handleKeep = useCallback(() => {
     const newInventory = [...inventory, wonItem];
     updateState(balance, newInventory);
+    setWonItem(null);
     setPhase('shop');
   }, [balance, inventory, wonItem]);
 
   const handleSell = useCallback((sellPrice) => {
     const newBalance = parseFloat((balance + sellPrice).toFixed(2));
     updateState(newBalance, inventory);
+    setWonItem(null);
     setPhase('shop');
   }, [balance, inventory]);
 
