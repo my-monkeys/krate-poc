@@ -20,7 +20,9 @@ export default function ItemStrip({ caseData, wonItem, onAnimationEnd }) {
     setItems(strip);
     setHighlightedIndex(null);
 
-    const pendingTimers = [];
+    let rafId = null;
+    let endTimer = null;
+    let revealTimer = null;
 
     const startTimer = setTimeout(() => {
       if (!containerRef.current || !stripRef.current) return;
@@ -31,33 +33,32 @@ export default function ItemStrip({ caseData, wonItem, onAnimationEnd }) {
       stripRef.current.style.transition = `transform ${ANIMATION_DURATION}ms cubic-bezier(0.15, 0, 0.1, 1)`;
       stripRef.current.style.transform = `translateX(${targetX}px)`;
 
-      let delay = 30;
-      let tickCount = 0;
-      const MAX_TICKS = 60;
-
-      const scheduleTick = () => {
-        if (tickCount >= MAX_TICKS) return;
-        const t = setTimeout(() => {
+      let lastIndex = -1;
+      const trackTicks = () => {
+        if (!stripRef.current) return;
+        const x = new DOMMatrix(getComputedStyle(stripRef.current).transform).m41;
+        const idx = Math.floor((-x + containerWidth / 2) / ITEM_WIDTH);
+        if (idx !== lastIndex) {
+          lastIndex = idx;
           playTick();
-          tickCount++;
-          delay = Math.min(delay * 1.08, 400);
-          scheduleTick();
-        }, delay);
-        pendingTimers.push(t);
+        }
+        rafId = requestAnimationFrame(trackTicks);
       };
-      scheduleTick();
+      rafId = requestAnimationFrame(trackTicks);
 
-      const endTimer = setTimeout(() => {
+      endTimer = setTimeout(() => {
+        cancelAnimationFrame(rafId);
+        rafId = null;
         setHighlightedIndex(WINNER_INDEX);
-        const revealTimer = setTimeout(onAnimationEnd, 1200);
-        pendingTimers.push(revealTimer);
+        revealTimer = setTimeout(onAnimationEnd, 1200);
       }, ANIMATION_DURATION);
-      pendingTimers.push(endTimer);
     }, 100);
 
     return () => {
       clearTimeout(startTimer);
-      pendingTimers.forEach(clearTimeout);
+      if (rafId) cancelAnimationFrame(rafId);
+      if (endTimer) clearTimeout(endTimer);
+      if (revealTimer) clearTimeout(revealTimer);
     };
   }, [caseData, wonItem, onAnimationEnd]);
 

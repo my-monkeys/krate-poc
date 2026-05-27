@@ -9,17 +9,20 @@ export default function CaseCard({ caseData, onOpen, disabled }) {
       }}
       onClick={() => !disabled && onOpen(caseData)}
     >
-      {/* Image placeholder */}
       <div
         className="w-full flex items-center justify-center"
         style={{ height: 140, background: 'linear-gradient(135deg, #1a1d2e, #252a3f)' }}
       >
-        <svg viewBox="0 0 80 60" className="w-28 opacity-70" fill="none">
-          <rect x="4" y="16" width="72" height="40" rx="4" fill="#2a3050" stroke="#4b5280" strokeWidth="1.5" />
-          <rect x="16" y="8" width="48" height="16" rx="3" fill="#232840" stroke="#4b5280" strokeWidth="1.5" />
-          <path d="M28 36 L40 26 L52 36" stroke="#6b7eb8" strokeWidth="2" fill="none" />
-          <circle cx="40" cy="38" r="4" fill="#6b7eb8" />
-        </svg>
+        {caseData.image ? (
+          <img src={caseData.image} alt={caseData.name} className="w-full h-full object-contain p-3" draggable={false} />
+        ) : (
+          <svg viewBox="0 0 80 60" className="w-28 opacity-70" fill="none">
+            <rect x="4" y="16" width="72" height="40" rx="4" fill="#2a3050" stroke="#4b5280" strokeWidth="1.5" />
+            <rect x="16" y="8" width="48" height="16" rx="3" fill="#232840" stroke="#4b5280" strokeWidth="1.5" />
+            <path d="M28 36 L40 26 L52 36" stroke="#6b7eb8" strokeWidth="2" fill="none" />
+            <circle cx="40" cy="38" r="4" fill="#6b7eb8" />
+          </svg>
+        )}
       </div>
 
       <div className="w-full px-4 py-3 flex flex-col gap-2">

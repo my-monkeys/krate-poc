@@ -1,8 +1,9 @@
-import { RARITIES } from '@/data/cases.js';
+import { RARITIES, ITEM_IMAGES } from '@/data/cases.js';
 
 export default function ItemCard({ item, highlighted = false, size = 'md' }) {
   const rarity = RARITIES[item.rarity] ?? RARITIES.consumer;
   const color = rarity.color;
+  const imageUrl = ITEM_IMAGES[`${item.weapon} | ${item.name}`];
 
   const sizeClasses = {
     sm: 'w-24 h-28',
@@ -20,16 +21,19 @@ export default function ItemCard({ item, highlighted = false, size = 'md' }) {
         transition: 'box-shadow 0.3s ease',
       }}
     >
-      {/* Zone image (placeholder SVG coloré) */}
       <div
         className="w-full flex-1 flex items-center justify-center"
         style={{ background: `${color}10` }}
       >
-        <svg viewBox="0 0 64 64" className="w-16 h-16 opacity-60" fill={color}>
-          <rect x="8" y="24" width="48" height="28" rx="2" />
-          <rect x="20" y="16" width="24" height="12" rx="2" />
-          <circle cx="32" cy="38" r="6" fill={color} opacity="0.8" />
-        </svg>
+        {imageUrl ? (
+          <img src={imageUrl} alt={item.name} className="w-full h-full object-contain p-1" draggable={false} />
+        ) : (
+          <svg viewBox="0 0 64 64" className="w-16 h-16 opacity-60" fill={color}>
+            <rect x="8" y="24" width="48" height="28" rx="2" />
+            <rect x="20" y="16" width="24" height="12" rx="2" />
+            <circle cx="32" cy="38" r="6" fill={color} opacity="0.8" />
+          </svg>
+        )}
       </div>
 
       {/* Bande de rareté en bas */}
