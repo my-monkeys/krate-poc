@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickItem } from './rng.js';
+import { pickItem, generateStripItems } from './rng.js';
 import { CASES } from '../data/cases.js';
 
 describe('pickItem', () => {
@@ -36,5 +36,20 @@ describe('pickItem', () => {
     }
     const rarities = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     expect(rarities[0][0]).toBe('consumer');
+  });
+});
+
+describe('generateStripItems', () => {
+  it('returns an array of the requested length', () => {
+    const items = generateStripItems(CASES[0], 50);
+    expect(items).toHaveLength(50);
+  });
+
+  it('each item in the strip belongs to the case', () => {
+    const caseData = CASES[0];
+    const items = generateStripItems(caseData, 20);
+    for (const item of items) {
+      expect(caseData.items.some(i => i.id === item.id)).toBe(true);
+    }
   });
 });
